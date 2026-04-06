@@ -2,8 +2,6 @@ package core.basesyntax;
 
 import java.util.List;
 
-import org.w3c.dom.Node;
-
 public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     private int size;
     private Node first;
@@ -52,17 +50,17 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
 
     @Override
     public T set(T value, int index) {
-        Node xNode = findNode(index);
-        T oldValue = (T) xNode.item;
-        xNode.item = value;
+        Node x = findNode(index);
+        T oldValue = (T) x.item;
+        x.item = value;
         return oldValue;
     }
 
     @Override
     public T remove(int index) {
-        Node xNode = findNode(index);
-        T theItem = (T) xNode.item;
-        unlink(xNode);
+        Node x = findNode(index);
+        T theItem = (T) x.item;
+        unlink(x);
         return theItem;
     }
 
@@ -91,20 +89,20 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     }
 
     private Node findNode(int index) {
-        Node xNode = first;
+        Node x = first;
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Invalid index");
         }
         if (index < size / 2) {
             for (int i = 0; i < index; i++) {
-                xNode = xNode.next;
+                x = x.next;
             }
         } else {
             for (int i = size - 1; i > index; i--) {
-                xNode = xNode.prev;
+                x = x.prev;
             }
         }
-        return xNode;
+        return x;
     }
 
     private void unlink(Node node) {
@@ -125,9 +123,9 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     }
 
     private static class Node<E> {
-        E item;
-        Node<E> next;
-        Node<E> prev;
+        private E item;
+        private Node<E> next;
+        private Node<E> prev;
 
         Node(Node<E> prev, E element, Node<E> next) {
             this.item = element;
