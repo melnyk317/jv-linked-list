@@ -34,7 +34,9 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         }
         Node theNode = findNode(index);
         Node newNode = new Node<T>(theNode.prev, value, theNode);
-        newNode.prev.next = newNode;
+        if (index != 0) {
+            newNode.prev.next = newNode;
+        }
         newNode.next.prev = newNode;
         size++;
     }
@@ -85,10 +87,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
 
     @Override
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
+        return size == 0;
     }
 
     private Node findNode(int index) {
