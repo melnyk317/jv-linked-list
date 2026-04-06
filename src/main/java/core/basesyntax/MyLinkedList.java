@@ -2,6 +2,8 @@ package core.basesyntax;
 
 import java.util.List;
 
+import org.w3c.dom.Node;
+
 public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     private int size;
     private Node first;
@@ -19,6 +21,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         if (size == 0) {
             first = newNode;
         }
+        last.next = newNode;
         last = newNode;
         size++;
 
@@ -29,6 +32,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         Node theNode = findNode(index);
         if (index == size) {
             add(value);
+            return;
         }
         Node newNode = new Node<T>(theNode.prev, value, theNode);
         size++;
@@ -39,7 +43,6 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         for (int i = 0; i < list.size(); i++) {
             add(list.get(i));
         }
-        size += list.size();
     }
 
     @Override
@@ -49,8 +52,9 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
 
     @Override
     public T set(T value, int index) {
-        T oldValue = (T) findNode(index).item;
-        findNode(index).item = value;
+        Node xNode = findNode(index);
+        T oldValue = (T) xNode.item;
+        xNode.item = value;
         return oldValue;
     }
 
@@ -58,41 +62,15 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     public T remove(int index) {
         Node xNode = findNode(index);
         T theItem = (T) xNode.item;
-        if (xNode.prev == null) {
-            first = xNode.next;
-        } else {
-            xNode.prev.next = xNode.next;
-            xNode.prev = null;
-        }
-        if (xNode.next == null) {
-            last = xNode.prev;
-        } else {
-            xNode.next.prev = xNode.prev;
-            xNode.next = null;
-        }
-        xNode.item = null;
-        size--;
+        unlink(xNode);
         return theItem;
     }
 
     @Override
     public boolean remove(T object) {
         for (Node node = first; node != null; node = node.next) {
-            if (object.equals(node.item)) {
-                if (node.prev == null) {
-                    first = node.next;
-                } else {
-                    node.prev.next = node.next;
-                    node.prev = null;
-                }
-                if (node.next == null) {
-                    last = node.prev;
-                } else {
-                    node.next.prev = node.prev;
-                    node.next = null;
-                }
-                node.item = null;
-                size--;
+            if (object == null ? node.item == null : object.equals(node.item)) {
+                unlink(node);
                 return true;
             }
         }
@@ -114,9 +92,47 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
 
     private Node findNode(int index) {
         Node xNode = first;
-        for (int i = 0; i <= index; i++) {
-            xNode.next = xNode;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Invalid index");
+        }
+        if (index < size / 2) {
+            for (int i = 0; i < index; i++) {
+                xNode = xNode.next;
+            }
+        } else {
+            for (int i = size - 1; i > index; i--) {
+                xNode = xNode.prev;
+            }
         }
         return xNode;
+    }
+
+    private void unlink(Node node) {
+        if (node.prev == null) {
+            first = node.next;
+        } else {
+            node.prev.next = node.next;
+            node.prev = null;
+        }
+        if (node.next == null) {
+            last = node.prev;
+        } else {
+            node.next.prev = node.prev;
+            node.next = null;
+        }
+        node.item = null;
+        size--;
+    }
+
+    private static class Node<E> {
+        E item;
+        Node<E> next;
+        Node<E> prev;
+
+        Node(Node<E> prev, E element, Node<E> next) {
+            this.item = element;
+            this.next = next;
+            this.prev = prev;
+        }
     }
 }
